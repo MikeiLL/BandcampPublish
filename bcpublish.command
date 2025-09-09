@@ -1,0 +1,1 @@
+python ~/bcpublish/app.py
