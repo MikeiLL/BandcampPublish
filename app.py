@@ -11,9 +11,9 @@ proc = subprocess.run(["pbpaste"], capture_output=True, encoding="UTF-8")
 trackurl = proc.stdout
 
 if not re.match("https://.*bandcamp.*[track|album]", trackurl):
-  print(f"""Hey! You must copy a bandcamp track or album link
+  print(f"""\x1b[1;31mHey! You must copy a bandcamp track or album link\x1b[0m
         eg: https://chrisbutler1.bandcamp.com/track/impeachment-day
-        You gave us {trackurl[:30]}
+        \x1b[1;31mYou gave us {trackurl[:30]}\x1b[0m
 """)
   sys.exit()
 
@@ -36,12 +36,14 @@ pagerequest = requests.get(trackurl)
 
 ParseBandcamp().feed(pagerequest.content.decode())
 
+ITEM_TYPE_DISPLAY = {"t": "track", "a": "album"}.get(ITEM_TYPE, ITEM_TYPE)
+
 if not ITEM_ID:
   print("Something went wrong. No Item ID.")
   sys.exit()
 
 print(f"""Okay great! We got the data from Bandcamp.
-Looks like the {"track" if ITEM_TYPE == 't' else 'album'},  {ITEM_TITLE}.
+Looks like the {ITEM_TYPE_DISPLAY},  {ITEM_TITLE}.
 Publishing the player now...
 """)
 
@@ -64,7 +66,7 @@ resp = requests.put(F"https://api.github.com/repos/MikeiLL/futurefossilmusicsite
   "X-GitHub-Api-Version": "2022-11-28",
 })
 if resp.status_code == 422:
-  print("Hmmm. Is that track already posted?\n")
+  print(f"\x1b[1;33mHmmm. Is that {ITEM_TYPE_DISPLAY} already posted?\x1b[0m")
   sys.exit()
 resp.raise_for_status()
-print("Success. The new bandcamp player is publishing this very moment. It could take up to 15 minutes.")
+print("\x1b[1;32mSuccess. The new bandcamp player is publishing this very moment. It could take up to 15 minutes.\x1b[0m")
